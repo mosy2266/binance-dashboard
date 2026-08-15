@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: binance
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: binance_dev_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d binance"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./binance-backend
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/binance
+      DB_USERNAME: postgres
+      DB_PASSWORD: binance_dev_password
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  db-data:
