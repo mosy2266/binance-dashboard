@@ -64,7 +64,7 @@ JPA(`KlineRepository`)는 읽기 전용(마지막 저장 시각 조회, 범위 �
 
 **결론**: 장기간 백필 요구사항을 충족하는 것은 REST `klines` 페이지네이션(A)뿐이다. B는 참고용으로만 문서화하고(순간적 네트워크 유실 시 재연결 자체는 여전히 필요), C는 이 프로젝트 규모(심볼 2개, 저장 간격 1개)에 과설계라 채택하지 않았다.
 
-**최초 기동과 재시작 후 누락을 통합하는 방법**: 둘 다 "심볼별 마지막 저장 `open_time` → 현재"라는 동일한 gap 계산 함수(`GapCalculator`)로 처리한다. DB가 비어있으면(`lastOpenTime`이 없으면) 설정된 기본 lookback 기간(기본 90일, `binance.backfill.default-lookback-days`)부터 시작하고, 데이터가 있으면 마지막 저장 시각 다음 분부터 시작한다 — 별도의 초기 백필과 재시작 백필 기능을 만들지 않고 시작점 계산 하나로 통합했다(`KlineBackfillService.backfillSymbol`).
+**최초 기동과 재시작 후 누락을 통합하는 방법**: 둘 다 '심볼별 마지막 저장 `open_time` → 현재'라는 동일한 gap 계산 함수(`GapCalculator`)로 처리한다. DB가 비어있으면(`lastOpenTime`이 없으면) 설정된 기본 lookback 기간(기본 90일, `binance.backfill.default-lookback-days`)부터 시작하고, 데이터가 있으면 마지막 저장 시각 다음 분부터 시작한다 — 별도의 초기 백필과 재시작 백필 기능을 만들지 않고 시작점 계산 하나로 통합했다(`KlineBackfillService.backfillSymbol`).
 
 이 동일한 메서드는 세 지점에서 재사용된다:
 
