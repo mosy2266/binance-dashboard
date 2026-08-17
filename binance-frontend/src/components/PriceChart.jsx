@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { formatPrice, formatTime } from '../utils/format'
+import { formatCompact, formatPrice, formatTime } from '../utils/format'
 
 const WIDTH = 640
 const HEIGHT = 260
@@ -59,30 +59,39 @@ export default function PriceChart({ symbol, interval, color, points }) {
       </div>
 
       {showTable ? (
-        <div className="chart-table-wrap">
-          <table className="chart-table">
-            <thead>
-              <tr>
-                <th>시간</th>
-                <th>종가</th>
-                <th>고가</th>
-                <th>저가</th>
-                <th>거래량</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[...points].reverse().map((p) => (
-                <tr key={p.time.getTime()}>
-                  <td>{formatTime(p.time, interval)}</td>
-                  <td>{formatPrice(p.close)}</td>
-                  <td>{formatPrice(p.high)}</td>
-                  <td>{formatPrice(p.low)}</td>
-                  <td>{formatPrice(p.volume)}</td>
+        <>
+          <p className="chart-table-caption">
+            선택한 간격({interval}) 기준 캔들 데이터입니다 — 아래 거래량/거래대금은 위 통계 카드의 24시간 누적 값과는 다른, 캔들 구간 하나치 값입니다.
+          </p>
+          <div className="chart-table-wrap">
+            <table className="chart-table">
+              <thead>
+                <tr>
+                  <th>시간</th>
+                  <th>종가</th>
+                  <th>고가</th>
+                  <th>저가</th>
+                  <th>거래량</th>
+                  <th>거래대금</th>
+                  <th>체결건수</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {[...points].reverse().map((p) => (
+                  <tr key={p.time.getTime()}>
+                    <td>{formatTime(p.time, interval)}</td>
+                    <td>{formatPrice(p.close)}</td>
+                    <td>{formatPrice(p.high)}</td>
+                    <td>{formatPrice(p.low)}</td>
+                    <td>{formatCompact(p.volume)}</td>
+                    <td>{formatCompact(p.quoteVolume)}</td>
+                    <td>{formatCompact(p.tradeCount)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       ) : (
         <div className="chart-svg-wrap">
           <svg
