@@ -13,6 +13,7 @@ function toPoint(raw) {
     close: Number(raw.closePrice),
     volume: Number(raw.volume),
     quoteVolume: Number(raw.quoteVolume),
+    tradeCount: Number(raw.tradeCount),
   }
 }
 

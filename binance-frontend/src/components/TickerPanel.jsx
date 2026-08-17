@@ -18,8 +18,8 @@ export default function TickerPanel({ ticker }) {
       />
       <StatTile label="24시간 고가" value={`$${formatPrice(ticker.highPrice)}`} />
       <StatTile label="24시간 저가" value={`$${formatPrice(ticker.lowPrice)}`} />
-      <StatTile label="거래량" value={formatCompact(ticker.volume)} />
-      <StatTile label="거래대금" value={`$${formatCompact(ticker.quoteVolume)}`} />
+      <StatTile label="24시간 거래량" value={formatCompact(ticker.volume)} />
+      <StatTile label="24시간 거래대금" value={`$${formatCompact(ticker.quoteVolume)}`} />
     </div>
   )
 }
