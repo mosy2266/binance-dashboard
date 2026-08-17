@@ -10,6 +10,7 @@ import java.net.http.HttpClient;
 import java.net.http.WebSocket;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -19,12 +20,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import reservation.binancebackend.config.BinanceProperties;
+import reservation.binancebackend.dto.KlineDto;
+import reservation.binancebackend.dto.TickerDto;
 import reservation.binancebackend.entity.Kline;
 import reservation.binancebackend.entity.Ticker24hStat;
 import reservation.binancebackend.repository.KlineUpsertDao;
 import reservation.binancebackend.repository.TickerUpsertDao;
 import reservation.binancebackend.service.KlineBackfillService;
 import reservation.binancebackend.service.KlineMapper;
+import reservation.binancebackend.websocket.MarketDataWebSocketHandler;
 
 @Component
 public class BinanceWebSocketClient {
@@ -39,6 +43,7 @@ public class BinanceWebSocketClient {
     private final TickerUpsertDao tickerUpsertDao;
     private final KlineBackfillService backfillService;
     private final ObjectMapper objectMapper;
+    private final MarketDataWebSocketHandler marketDataWebSocketHandler;
     private final HttpClient httpClient = HttpClient.newHttpClient();
     private final ScheduledExecutorService reconnectExecutor = Executors.newSingleThreadScheduledExecutor();
     private final AtomicInteger reconnectAttempt = new AtomicInteger(0);
@@ -48,13 +53,15 @@ public class BinanceWebSocketClient {
 
     public BinanceWebSocketClient(BinanceProperties properties, KlineMapper klineMapper,
             KlineUpsertDao klineUpsertDao, TickerUpsertDao tickerUpsertDao,
-            KlineBackfillService backfillService, ObjectMapper objectMapper) {
+            KlineBackfillService backfillService, ObjectMapper objectMapper,
+            MarketDataWebSocketHandler marketDataWebSocketHandler) {
         this.properties = properties;
         this.klineMapper = klineMapper;
         this.klineUpsertDao = klineUpsertDao;
         this.tickerUpsertDao = tickerUpsertDao;
         this.backfillService = backfillService;
         this.objectMapper = objectMapper;
+        this.marketDataWebSocketHandler = marketDataWebSocketHandler;
     }
 
     @PostConstruct
@@ -138,6 +145,11 @@ public class BinanceWebSocketClient {
                 k.path("n").asInt());
 
         klineUpsertDao.upsert(kline);
+
+        KlineDto klineDto = new KlineDto(kline.getOpenTime(), kline.getOpenPrice(), kline.getHighPrice(),
+                kline.getLowPrice(), kline.getClosePrice(), kline.getVolume(), kline.getQuoteVolume(),
+                kline.getTradeCount());
+        marketDataWebSocketHandler.broadcast(Map.of("type", "kline", "symbol", symbol, "data", klineDto));
     }
 
     private void handleTicker(JsonNode data) {
@@ -156,6 +168,11 @@ public class BinanceWebSocketClient {
                 .build();
 
         tickerUpsertDao.upsert(ticker);
+
+        TickerDto tickerDto = new TickerDto(ticker.getSymbol(), ticker.getLastPrice(), ticker.getPriceChange(),
+                ticker.getPriceChangePercent(), ticker.getHighPrice(), ticker.getLowPrice(), ticker.getVolume(),
+                ticker.getQuoteVolume(), ticker.getUpdatedAt());
+        marketDataWebSocketHandler.broadcast(Map.of("type", "ticker", "data", tickerDto));
     }
 
     private class StreamListener implements WebSocket.Listener {
