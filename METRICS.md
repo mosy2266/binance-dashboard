@@ -1,6 +1,6 @@
 # 수집 지표 및 선정 근거
 
-`binance-backend`가 BTCUSDT, ETHUSDT 두 종목에 대해 수집/제공 중인 지표와, 각 지표를 선택한 이유를 정리한다. 파이프라인 아키텍처 자체는 `DATA_PIPELINE_DESIGN.md`를 참고.
+`binance-backend`가 BTCUSDT, ETHUSDT 두 종목에 대해 수집/제공 중인 지표와, 각 지표를 선택한 이유를 정리한다.
 
 ## 1. 캔들(1분봉) — `kline_1m` / `GET /api/klines`
 
