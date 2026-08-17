@@ -2,7 +2,6 @@ package reservation.binancebackend.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import java.math.BigDecimal;
 import java.net.URI;
@@ -64,7 +63,6 @@ public class BinanceWebSocketClient {
         this.marketDataWebSocketHandler = marketDataWebSocketHandler;
     }
 
-    @PostConstruct
     public void connect() {
         URI uri = buildStreamUri();
         log.info("Connecting to Binance combined stream: {}", uri);
