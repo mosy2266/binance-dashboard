@@ -38,11 +38,11 @@ public class KlineBackfillService {
     }
 
     @Async("binanceTaskExecutor")
-    public void backfillSymbol(String symbol) {
+    public void backfillSymbol(String symbol, Instant requestedAt) {
         BinanceProperties.Backfill cfg = properties.getBackfill();
         Instant now = Instant.now();
         Instant cursor = gapCalculator.calculateStart(
-                klineRepository.findLastOpenTime(symbol), now, cfg.getDefaultLookbackDays());
+                klineRepository.findLastOpenTime(symbol), requestedAt, cfg.getDefaultLookbackDays());
 
         log.info("Backfill start symbol={} from={} to={}", symbol, cursor, now);
 

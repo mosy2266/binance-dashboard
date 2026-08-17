@@ -35,7 +35,7 @@ public class GapScanScheduler {
             Instant last = klineRepository.findLastOpenTime(symbol).orElse(null);
             if (last == null || Duration.between(last, now).toMinutes() > thresholdMinutes) {
                 log.info("Gap detected symbol={} lastOpenTime={}, triggering backfill", symbol, last);
-                backfillService.backfillSymbol(symbol);
+                backfillService.backfillSymbol(symbol, now);
             }
         });
     }

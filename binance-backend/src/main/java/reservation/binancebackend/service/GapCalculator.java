@@ -10,6 +10,7 @@ public class GapCalculator {
 
     public Instant calculateStart(Optional<Instant> lastOpenTime, Instant now, int defaultLookbackDays) {
         return lastOpenTime
+                .filter(t -> t.isBefore(now))
                 .map(t -> t.plus(1, ChronoUnit.MINUTES))
                 .orElse(now.minus(defaultLookbackDays, ChronoUnit.DAYS));
     }
