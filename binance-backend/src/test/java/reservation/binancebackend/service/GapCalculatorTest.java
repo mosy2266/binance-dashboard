@@ -29,4 +29,14 @@ class GapCalculatorTest {
 
         assertThat(start).isEqualTo(now.minus(90, ChronoUnit.DAYS));
     }
+
+    @Test
+    void calculateStart_usesDefaultLookback_whenLastOpenTimeIsNotBeforeNow() {
+        Instant now = Instant.parse("2026-08-15T00:00:00Z");
+        Instant lastOpenTime = now.plus(1, ChronoUnit.MINUTES);
+
+        Instant start = gapCalculator.calculateStart(Optional.of(lastOpenTime), now, 90);
+
+        assertThat(start).isEqualTo(now.minus(90, ChronoUnit.DAYS));
+    }
 }

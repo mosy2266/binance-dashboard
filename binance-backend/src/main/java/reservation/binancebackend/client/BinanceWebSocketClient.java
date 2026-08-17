@@ -183,7 +183,8 @@ public class BinanceWebSocketClient {
         public void onOpen(WebSocket webSocket) {
             log.info("Binance WebSocket connected");
             reconnectAttempt.set(0);
-            properties.getSymbols().forEach(backfillService::backfillSymbol);
+            Instant now = Instant.now();
+            properties.getSymbols().forEach(symbol -> backfillService.backfillSymbol(symbol, now));
             WebSocket.Listener.super.onOpen(webSocket);
         }
 

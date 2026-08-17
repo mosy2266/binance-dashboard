@@ -1,5 +1,6 @@
 package reservation.binancebackend.scheduler;
 
+import java.time.Instant;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -19,6 +20,7 @@ public class BackfillStartupRunner {
 
     @EventListener(ApplicationReadyEvent.class)
     public void onApplicationReady() {
-        properties.getSymbols().forEach(backfillService::backfillSymbol);
+        Instant now = Instant.now();
+        properties.getSymbols().forEach(symbol -> backfillService.backfillSymbol(symbol, now));
     }
 }
